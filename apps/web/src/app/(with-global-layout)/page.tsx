@@ -1,19 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, Heart, Star, Trophy, Users, PenTool, X } from 'lucide-react';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card } from '@repo/ui/components/ui/card';
-import { LuGift } from 'react-icons/lu';
+import { ChevronRight, Heart, Star, Trophy, Users, PenTool, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { LuGift } from 'react-icons/lu';
+
+// 상수 정의
+const TOTAL_SLIDES = 3;
+const LAST_SLIDE_INDEX = TOTAL_SLIDES - 1;
+const FIRST_SLIDE_INDEX = 0;
+const REDIRECT_DELAY_MS = 2000;
+const ANIMATION_DELAY_MULTIPLIER = 0.1;
+const PROGRESS_INDICATOR_COUNT = TOTAL_SLIDES;
 
 const OnboardingFlow = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(FIRST_SLIDE_INDEX);
   const [isSkipped, setIsSkipped] = useState(false);
   const router = useRouter();
 
   const nextSlide = () => {
-    if (currentSlide < 2) {
+    if (currentSlide < LAST_SLIDE_INDEX) {
       setCurrentSlide(currentSlide + 1);
     } else {
       setIsSkipped(true);
@@ -21,7 +29,7 @@ const OnboardingFlow = () => {
   };
 
   const prevSlide = () => {
-    if (currentSlide > 0) {
+    if (currentSlide > FIRST_SLIDE_INDEX) {
       setCurrentSlide(currentSlide - 1);
     }
   };
@@ -32,13 +40,13 @@ const OnboardingFlow = () => {
 
   if (isSkipped) {
     setTimeout(() => {
-      router.push('/auth/signin');
-    }, 2000);
+      router.push('/auth/signup');
+    }, REDIRECT_DELAY_MS);
 
     return (
-      <div className="via-background flex min-h-screen items-center justify-center bg-gradient-to-br from-(--color-secondary) to-(--color-primary)/20 px-6">
+      <div className="via-background from-(--color-secondary) to-(--color-primary)/20 flex min-h-screen items-center justify-center bg-gradient-to-br px-6">
         <div className="animate-fade-in-scale text-center">
-          <div className="animate-pulse-heart mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-(--color-primary) via-(--color-accent) to-(--color-green) shadow-2xl">
+          <div className="animate-pulse-heart from-(--color-primary) via-(--color-accent) to-(--color-green) mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br shadow-2xl">
             <Heart className="h-20 w-20 fill-current text-white" />
           </div>
           <h1 className="text-text-base mb-4 text-3xl font-bold">
@@ -46,7 +54,7 @@ const OnboardingFlow = () => {
             <br />
             따뜻한 경매
           </h1>
-          <p className="mb-8 text-lg text-(--color-warm-gray)">
+          <p className="text-(--color-warm-gray) mb-8 text-lg">
             온보딩을 완료했습니다.
             <br />
             이제 사연을 나누고 마음을 전해보세요.
@@ -57,13 +65,13 @@ const OnboardingFlow = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-(--color-secondary) via-(--color-background) to-(--color-primary)/20">
+    <div className="from-(--color-secondary) via-(--color-background) to-(--color-primary)/20 flex min-h-screen flex-col bg-gradient-to-br">
       {/* Skip Button */}
-      <div className="flex justify-end pt-8 pr-6">
+      <div className="flex justify-end pr-6 pt-8">
         <Button
           variant="ghost"
           onClick={skipIntro}
-          className="text-sm text-(--color-warm-gray) hover:text-(--color-accent)"
+          className="text-(--color-warm-gray) hover:text-(--color-accent) text-sm"
         >
           건너뛰기 <X className="ml-1 h-4 w-4" />
         </Button>
@@ -72,15 +80,15 @@ const OnboardingFlow = () => {
       {/* Progress Indicator */}
       <div className="flex justify-center pb-4">
         <div className="flex space-x-2">
-          {[0, 1, 2].map((index) => (
+          {Array.from({ length: PROGRESS_INDICATOR_COUNT }, (_, index) => (
             <div
               key={index}
               className={`h-2 rounded-full transition-all duration-300 ${
                 index === currentSlide
-                  ? 'w-8 bg-(--color-accent)'
+                  ? 'bg-(--color-accent) w-8'
                   : index < currentSlide
-                    ? 'w-2 bg-(--color-primary)'
-                    : 'w-2 bg-(--color-light-gray)/20'
+                    ? 'bg-(--color-primary) w-2'
+                    : 'bg-(--color-light-gray)/20 w-2'
               }`}
             />
           ))}
@@ -88,9 +96,9 @@ const OnboardingFlow = () => {
       </div>
 
       <div className="flex flex-1 flex-col">
-        {currentSlide === 0 && <SlideOne />}
+        {currentSlide === FIRST_SLIDE_INDEX && <SlideOne />}
         {currentSlide === 1 && <SlideTwo />}
-        {currentSlide === 2 && <SlideThree />}
+        {currentSlide === LAST_SLIDE_INDEX && <SlideThree />}
       </div>
 
       {/* Navigation */}
@@ -98,16 +106,16 @@ const OnboardingFlow = () => {
         <Button
           variant="ghost"
           onClick={prevSlide}
-          disabled={currentSlide === 0}
+          disabled={currentSlide === FIRST_SLIDE_INDEX}
           className="text-(--color-warm-gray) hover:text-(--color-accent) disabled:opacity-30"
         >
           이전
         </Button>
         <Button
           onClick={nextSlide}
-          className="rounded-xl bg-(--color-accent) px-8 py-3 text-white shadow-lg hover:bg-(--color-accent)/90"
+          className="bg-(--color-accent) hover:bg-(--color-accent)/90 rounded-xl px-8 py-3 text-white shadow-lg"
         >
-          {currentSlide === 2 ? '시작하기' : '다음'} <ChevronRight className="ml-2 h-4 w-4" />
+          {currentSlide === LAST_SLIDE_INDEX ? '시작하기' : '다음'} <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -117,17 +125,17 @@ const OnboardingFlow = () => {
 const SlideOne = () => (
   <div className="animate-slide-up flex flex-1 flex-col items-center justify-center px-6 text-center">
     <div className="relative mb-8">
-      <div className="animate-float mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-(--color-primary) to-(--color-accent) shadow-xl">
+      <div className="animate-float from-(--color-primary) to-(--color-accent) mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br shadow-xl">
         <LuGift className="size-15 text-white" />
       </div>
-      <div className="animate-pulse-heart absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-(--color-red)">
+      <div className="animate-pulse-heart bg-(--color-red) absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full">
         <span className="text-sm text-white">🏷️</span>
       </div>
     </div>
 
-    <h1 className="text-text-base mb-4 text-3xl leading-tight font-bold">마음으로 하는 경매</h1>
+    <h1 className="text-text-base mb-4 text-3xl font-bold leading-tight">마음으로 하는 경매</h1>
 
-    <p className="mb-8 max-w-sm text-lg leading-relaxed text-(--color-warm-gray)">
+    <p className="text-(--color-warm-gray) mb-8 max-w-sm text-lg leading-relaxed">
       커피 한 잔, 식사 한 끼, 그리고 따뜻한 마음.
       <br />
       이제는 사연으로 나누세요.
@@ -135,17 +143,17 @@ const SlideOne = () => (
 
     <Card className="animate-fade-in-scale w-full max-w-sm border-0 bg-white/80 p-4 shadow-lg backdrop-blur-sm">
       <div className="mb-3 flex items-center space-x-3">
-        <div className="h-3 w-3 rounded-full bg-(--color-red)"></div>
-        <div className="h-3 w-3 rounded-full bg-(--color-yellow)"></div>
-        <div className="h-3 w-3 rounded-full bg-(--color-green)"></div>
+        <div className="bg-(--color-red) h-3 w-3 rounded-full"></div>
+        <div className="bg-(--color-yellow) h-3 w-3 rounded-full"></div>
+        <div className="bg-(--color-green) h-3 w-3 rounded-full"></div>
       </div>
       <div className="space-y-3">
-        <div className="h-3 w-3/4 rounded bg-(--color-light-gray)/20"></div>
-        <div className="rounded-lg bg-(--color-secondary) p-3">
+        <div className="bg-(--color-light-gray)/20 h-3 w-3/4 rounded"></div>
+        <div className="bg-(--color-secondary) rounded-lg p-3">
           <p className="text-text-base text-sm font-medium">2인 식사권</p>
-          <p className="mt-1 text-xs text-(--color-warm-gray)">로맨틱한 저녁 식사</p>
+          <p className="text-(--color-warm-gray) mt-1 text-xs">로맨틱한 저녁 식사</p>
         </div>
-        <div className="h-2 w-1/2 rounded bg-(--color-light-gray)/10"></div>
+        <div className="bg-(--color-light-gray)/10 h-2 w-1/2 rounded"></div>
       </div>
     </Card>
   </div>
@@ -154,17 +162,17 @@ const SlideOne = () => (
 const SlideTwo = () => (
   <div className="animate-slide-up flex flex-1 flex-col items-center justify-center px-6 text-center">
     <div className="relative mb-8">
-      <div className="animate-float mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-(--color-accent) to-(--color-primary) shadow-xl">
+      <div className="animate-float from-(--color-accent) to-(--color-primary) mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br shadow-xl">
         <PenTool className="h-16 w-16 text-white" />
       </div>
-      <div className="animate-pulse-heart absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-(--color-primary)">
+      <div className="animate-pulse-heart bg-(--color-primary) absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full">
         <span className="text-sm text-white">📝</span>
       </div>
     </div>
 
-    <h1 className="text-text-base mb-4 text-3xl leading-tight font-bold">사연으로 입찰하세요</h1>
+    <h1 className="text-text-base mb-4 text-3xl font-bold leading-tight">사연으로 입찰하세요</h1>
 
-    <p className="mb-8 max-w-sm text-lg leading-relaxed text-(--color-warm-gray)">
+    <p className="text-(--color-warm-gray) mb-8 max-w-sm text-lg leading-relaxed">
       왜 필요한지 이야기해 주세요.
       <br />
       <em className="text-(--color-accent)">&quot;엄마 생신이라…&quot;</em>
@@ -179,15 +187,15 @@ const SlideTwo = () => (
         <Card
           key={index}
           className={`animate-fade-in-scale border-0 bg-white/80 p-4 shadow-lg backdrop-blur-sm`}
-          style={{ animationDelay: `${index * 0.1}s` }}
+          style={{ animationDelay: `${index * ANIMATION_DELAY_MULTIPLIER}s` }}
         >
           <p className="text-text-base mb-3 text-sm leading-relaxed">{item.story}</p>
           <div className="flex items-center justify-between">
-            <Button size="sm" className="border-0 bg-(--color-red)/10 text-(--color-red) hover:bg-(--color-red)/20">
+            <Button size="sm" className="bg-(--color-red)/10 text-(--color-red) hover:bg-(--color-red)/20 border-0">
               <Heart className="mr-1 h-4 w-4 fill-current" />
               좋아요
             </Button>
-            <span className="text-xs font-medium text-(--color-warm-gray)">{item.likes}개</span>
+            <span className="text-(--color-warm-gray) text-xs font-medium">{item.likes}개</span>
           </div>
         </Card>
       ))}
@@ -198,27 +206,27 @@ const SlideTwo = () => (
 const SlideThree = () => (
   <div className="animate-slide-up flex flex-1 flex-col items-center justify-center px-6 text-center">
     <div className="relative mb-8">
-      <div className="animate-float mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-(--color-green) to-(--color-accent) shadow-xl">
+      <div className="animate-float from-(--color-green) to-(--color-accent) mb-4 flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br shadow-xl">
         <Trophy className="h-16 w-16 text-white" />
       </div>
-      <div className="animate-pulse-heart absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-(--color-green)">
+      <div className="animate-pulse-heart bg-(--color-green) absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full">
         <span className="text-sm text-white">🎉</span>
       </div>
     </div>
 
-    <h1 className="text-text-base mb-4 text-3xl leading-tight font-bold">좋아요로 낙찰 결정</h1>
+    <h1 className="text-text-base mb-4 text-3xl font-bold leading-tight">좋아요로 낙찰 결정</h1>
 
-    <p className="mb-8 max-w-sm text-lg leading-relaxed text-(--color-warm-gray)">
+    <p className="text-(--color-warm-gray) mb-8 max-w-sm text-lg leading-relaxed">
       가장 많은 공감을 받은 사연이 낙찰됩니다.
       <br />
-      <span className="font-medium text-(--color-accent)">좋아요는 포인트로 눌러요.</span>
+      <span className="text-(--color-accent) font-medium">좋아요는 포인트로 눌러요.</span>
     </p>
 
     <div className="w-full max-w-sm">
-      <Card className="animate-fade-in-scale border-2 border-(--color-green)/20 bg-gradient-to-r from-(--color-green)/10 to-(--color-primary)/10 p-4 shadow-xl backdrop-blur-sm">
+      <Card className="animate-fade-in-scale border-(--color-green)/20 from-(--color-green)/10 to-(--color-primary)/10 border-2 bg-gradient-to-r p-4 shadow-xl backdrop-blur-sm">
         <div className="mb-2 flex items-center">
-          <Trophy className="mr-2 h-5 w-5 text-(--color-green)" />
-          <span className="text-sm font-bold text-(--color-green)">낙찰된 사연</span>
+          <Trophy className="text-(--color-green) mr-2 h-5 w-5" />
+          <span className="text-(--color-green) text-sm font-bold">낙찰된 사연</span>
         </div>
         <p className="text-text-base mb-3 text-sm leading-relaxed">
           &quot;엄마 생신이라 오랜만에 둘이서 외식을 하고 싶어요. 아버지가 돌아가신 후 혼자 계셔서 마음이
@@ -226,18 +234,18 @@ const SlideThree = () => (
         </p>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Heart className="mr-1 h-4 w-4 fill-current text-(--color-red)" />
+            <Heart className="text-(--color-red) mr-1 h-4 w-4 fill-current" />
             <span className="text-text-base font-bold">47개</span>
           </div>
-          <div className="flex items-center text-(--color-green)">
+          <div className="text-(--color-green) flex items-center">
             <Star className="mr-1 h-4 w-4 fill-current" />
             <span className="text-sm font-medium">낙찰!</span>
           </div>
         </div>
       </Card>
 
-      <div className="mt-4 rounded-lg bg-(--color-accent)/10 p-3">
-        <div className="flex items-center justify-center text-sm text-(--color-accent)">
+      <div className="bg-(--color-accent)/10 mt-4 rounded-lg p-3">
+        <div className="text-(--color-accent) flex items-center justify-center text-sm">
           <Users className="mr-2 h-4 w-4" />
           <span>일반 유저 + 판매자 좋아요 = 총점</span>
         </div>
