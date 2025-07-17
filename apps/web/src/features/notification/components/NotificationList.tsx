@@ -8,7 +8,7 @@ interface NotificationListProps {
 
 //NOTE - Header 알림 리스트는 5개만 보이도록 설정, 알림 페이지로 이동하면 리스트 10개 보이도록 설정
 
-const NotificationList = ({ type = 'popover' }: NotificationListProps) => {
+const NotificationList = ({ type = 'full' }: NotificationListProps) => {
   return (
     <ul className="mb-0">
       <NotificationListItem type={type} />

@@ -6,6 +6,7 @@ import { Card } from '@repo/ui/components/ui/card';
 import { ChevronRight, Heart, Star, Trophy, Users, PenTool, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { LuGift } from 'react-icons/lu';
+import { Metadata } from 'next';
 
 // 상수 정의
 const TOTAL_SLIDES = 3;
@@ -253,5 +254,35 @@ const SlideThree = () => (
     </div>
   </div>
 );
+
+//NOTE - 버셀 베포 후 URL 변경
+const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+  ? process.env.NEXT_PUBLIC_VERCEL_URL
+  : process.env.NEXT_PUBLIC_DEV_CLIENT_URL;
+
+export const metadata: Metadata = {
+  metadataBase: new URL(defaultUrl!),
+  title: 'Vidding',
+  description: '당신의 가치를 입찰하세요!',
+  keywords: ['Vidding', 'vidding', 'VIDDING', 'Bidding', 'bidding', '가치입찰'],
+  creator: 'VID',
+  openGraph: {
+    title: 'Vidding',
+    description: '당신의 가치를 입찰하세요!',
+    // images: [
+    //   {
+    //     // url: "",
+    //     width: 1200,
+    //     height: 630,
+    //     alt: 'Vidding'
+    //   }
+    // ],
+
+    url: 'https://kfe-3-e2e-n-much-web.vercel.app/',
+    siteName: 'Vidding',
+    locale: 'ko_KR',
+    type: 'website'
+  }
+};
 
 export default OnboardingFlow;

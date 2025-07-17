@@ -8,7 +8,7 @@ const NotificationButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   //NOTE - 임시적으로 알림이 없다고 가정
-  const hasUnread = false;
+  const hasUnread = true;
   return (
     <div className="flex items-center">
       <NotificationPopover
