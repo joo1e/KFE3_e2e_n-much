@@ -40,7 +40,6 @@ export type Database = {
           created_at: string;
           detail_address: string | null;
           is_default: boolean;
-          phone_number: string;
           postal_code: string;
           road_address: string;
           user_id: string | null;
@@ -51,7 +50,6 @@ export type Database = {
           created_at?: string;
           detail_address?: string | null;
           is_default: boolean;
-          phone_number: string;
           postal_code: string;
           road_address: string;
           user_id?: string | null;
@@ -62,19 +60,11 @@ export type Database = {
           created_at?: string;
           detail_address?: string | null;
           is_default?: boolean;
-          phone_number?: string;
           postal_code?: string;
           road_address?: string;
           user_id?: string | null;
         };
         Relationships: [
-          {
-            foreignKeyName: 'addresses_address_id_fkey';
-            columns: ['address_id'];
-            isOneToOne: true;
-            referencedRelation: 'addresses';
-            referencedColumns: ['address_id'];
-          },
           {
             foreignKeyName: 'addresses_user_id_fkey';
             columns: ['user_id'];
@@ -92,6 +82,7 @@ export type Database = {
           description: string;
           end_date: string;
           favorites: string[] | null;
+          highest_bidder_id: string | null;
           image_urls: string[];
           max_point: number;
           starting_point: number;
@@ -107,7 +98,8 @@ export type Database = {
           description: string;
           end_date: string;
           favorites?: string[] | null;
-          image_urls: string[];
+          highest_bidder_id?: string | null;
+          image_urls?: string[];
           max_point: number;
           starting_point: number;
           status: string;
@@ -122,6 +114,7 @@ export type Database = {
           description?: string;
           end_date?: string;
           favorites?: string[] | null;
+          highest_bidder_id?: string | null;
           image_urls?: string[];
           max_point?: number;
           starting_point?: number;
@@ -134,7 +127,46 @@ export type Database = {
           {
             foreignKeyName: 'auctions_user_id_fkey';
             columns: ['user_id'];
-            isOneToOne: true;
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      bids: {
+        Row: {
+          auction_id: string;
+          bid_amount: number;
+          bid_time: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          auction_id: string;
+          bid_amount: number;
+          bid_time?: string;
+          id?: string;
+          user_id: string;
+        };
+        Update: {
+          auction_id?: string;
+          bid_amount?: number;
+          bid_time?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'bids_auction_id_fkey';
+            columns: ['auction_id'];
+            isOneToOne: false;
+            referencedRelation: 'auctions';
+            referencedColumns: ['auction_id'];
+          },
+          {
+            foreignKeyName: 'bids_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
             referencedRelation: 'users';
             referencedColumns: ['id'];
           }
@@ -197,6 +229,27 @@ export type Database = {
           }
         ];
       };
+      keywords: {
+        Row: {
+          count: number;
+          keyword: string;
+          keyword_id: number;
+          updated_at: string;
+        };
+        Insert: {
+          count?: number;
+          keyword: string;
+          keyword_id?: number;
+          updated_at?: string;
+        };
+        Update: {
+          count?: number;
+          keyword?: string;
+          keyword_id?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       points: {
         Row: {
           amount: number;
@@ -238,6 +291,51 @@ export type Database = {
           }
         ];
       };
+      ranking: {
+        Row: {
+          auction_id: string;
+          bid_amount: number;
+          created_at: string;
+          id: string;
+          rank_position: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          auction_id: string;
+          bid_amount: number;
+          created_at?: string;
+          id?: string;
+          rank_position: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          auction_id?: string;
+          bid_amount?: number;
+          created_at?: string;
+          id?: string;
+          rank_position?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ranking_auction_id_fkey';
+            columns: ['auction_id'];
+            isOneToOne: false;
+            referencedRelation: 'auctions';
+            referencedColumns: ['auction_id'];
+          },
+          {
+            foreignKeyName: 'ranking_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
       users: {
         Row: {
           address_id: string | null;
@@ -246,6 +344,7 @@ export type Database = {
           id: string;
           nick_name: string;
           role: string;
+          user_avatar: string | null;
         };
         Insert: {
           address_id?: string | null;
@@ -254,6 +353,7 @@ export type Database = {
           id?: string;
           nick_name: string;
           role: string;
+          user_avatar?: string | null;
         };
         Update: {
           address_id?: string | null;
@@ -262,15 +362,80 @@ export type Database = {
           id?: string;
           nick_name?: string;
           role?: string;
+          user_avatar?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'users_address_id_fkey';
+            columns: ['address_id'];
+            isOneToOne: false;
+            referencedRelation: 'addresses';
+            referencedColumns: ['address_id'];
+          }
+        ];
       };
     };
     Views: {
-      [_ in never]: never;
+      user_bid_totals: {
+        Row: {
+          auction_id: string | null;
+          episode_id: string | null;
+          total_bid_points: number | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'episodes_auction_id_fkey';
+            columns: ['auction_id'];
+            isOneToOne: false;
+            referencedRelation: 'auctions';
+            referencedColumns: ['auction_id'];
+          },
+          {
+            foreignKeyName: 'points_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      get_auction_details: {
+        Args: { auction_id: string } | { auction_id_param: string } | { user_id: number };
+        Returns: {
+          title: string;
+          description: string;
+          starting_point: number;
+          max_point: number;
+          image_urls: string[];
+          end_date: string;
+          business_name: string;
+          postal_code: string;
+          road_address: string;
+          detail_address: string;
+        }[];
+      };
+      get_auction_form: {
+        Args: { auction_id_param: string };
+        Returns: {
+          title: string;
+          description: string;
+          starting_point: number;
+          max_point: number;
+          image_urls: string[];
+          end_date: string;
+          business_name: string;
+          postal_code: string;
+          road_address: string;
+          detail_address: string;
+        }[];
+      };
+      set_winning_bid: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

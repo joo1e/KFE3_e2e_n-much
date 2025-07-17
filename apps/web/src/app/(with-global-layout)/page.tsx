@@ -1,70 +1,6 @@
-'use client';
+import OnboardingPage from 'src/features/layout/onboarding/OnboardingPage';
 
-import { useState } from 'react';
-import { Button } from '@repo/ui/components/ui/button';
-import { Card } from '@repo/ui/components/ui/card';
-import { ChevronRight, Heart, Star, Trophy, Users, PenTool, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { LuGift } from 'react-icons/lu';
-import { Metadata } from 'next';
-
-// 상수 정의
-const TOTAL_SLIDES = 3;
-const LAST_SLIDE_INDEX = TOTAL_SLIDES - 1;
-const FIRST_SLIDE_INDEX = 0;
-const REDIRECT_DELAY_MS = 2000;
-const ANIMATION_DELAY_MULTIPLIER = 0.1;
-const PROGRESS_INDICATOR_COUNT = TOTAL_SLIDES;
-
-const OnboardingFlow = () => {
-  const [currentSlide, setCurrentSlide] = useState(FIRST_SLIDE_INDEX);
-  const [isSkipped, setIsSkipped] = useState(false);
-  const router = useRouter();
-
-  const nextSlide = () => {
-    if (currentSlide < LAST_SLIDE_INDEX) {
-      setCurrentSlide(currentSlide + 1);
-    } else {
-      setIsSkipped(true);
-    }
-  };
-
-  const prevSlide = () => {
-    if (currentSlide > FIRST_SLIDE_INDEX) {
-      setCurrentSlide(currentSlide - 1);
-    }
-  };
-
-  const skipIntro = () => {
-    setIsSkipped(true);
-  };
-
-  if (isSkipped) {
-    setTimeout(() => {
-      router.push('/auth/signup');
-    }, REDIRECT_DELAY_MS);
-
-    return (
-      <div className="via-background from-(--color-secondary) to-(--color-primary)/20 flex min-h-screen items-center justify-center bg-gradient-to-br px-6">
-        <div className="animate-fade-in-scale text-center">
-          <div className="animate-pulse-heart from-(--color-primary) via-(--color-accent) to-(--color-green) mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br shadow-2xl">
-            <Heart className="h-20 w-20 fill-current text-white" />
-          </div>
-          <h1 className="text-text-base mb-4 text-3xl font-bold">
-            사연으로 만나는
-            <br />
-            따뜻한 경매
-          </h1>
-          <p className="text-(--color-warm-gray) mb-8 text-lg">
-            온보딩을 완료했습니다.
-            <br />
-            이제 사연을 나누고 마음을 전해보세요.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+const Onboarding = () => {
   return (
     <div className="from-(--color-secondary) via-(--color-background) to-(--color-primary)/20 flex min-h-screen flex-col bg-gradient-to-br">
       {/* Skip Button */}
@@ -254,35 +190,5 @@ const SlideThree = () => (
     </div>
   </div>
 );
-
-//NOTE - 버셀 베포 후 URL 변경
-const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? process.env.NEXT_PUBLIC_VERCEL_URL
-  : process.env.NEXT_PUBLIC_DEV_CLIENT_URL;
-
-export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl!),
-  title: 'Vidding',
-  description: '당신의 가치를 입찰하세요!',
-  keywords: ['Vidding', 'vidding', 'VIDDING', 'Bidding', 'bidding', '가치입찰'],
-  creator: 'VID',
-  openGraph: {
-    title: 'Vidding',
-    description: '당신의 가치를 입찰하세요!',
-    // images: [
-    //   {
-    //     // url: "",
-    //     width: 1200,
-    //     height: 630,
-    //     alt: 'Vidding'
-    //   }
-    // ],
-
-    url: 'https://kfe-3-e2e-n-much-web.vercel.app/',
-    siteName: 'Vidding',
-    locale: 'ko_KR',
-    type: 'website'
-  }
-};
 
 export default OnboardingFlow;
