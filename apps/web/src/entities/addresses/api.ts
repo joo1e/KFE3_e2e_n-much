@@ -1,3 +1,5 @@
+//주소등록하면 수파베이스에 등록하는 것은 되지만, 수파베이스에서 데이터를 가져와서 AddressList에 반영하는 것은 안됨
+
 import type { AddressRow, AddressInsert } from 'src/shared/supabase/types';
 
 // 기본 주소 정보 조회
@@ -39,7 +41,6 @@ export const getAddressList = async (userId: string): Promise<AddressRow[]> => {
     throw new Error(error.error || '주소 목록을 불러오는 데 실패했습니다.');
   }
 
-  // 주소 배열이 온다고 가정!
   const result = await res.json();
   return result;
 };

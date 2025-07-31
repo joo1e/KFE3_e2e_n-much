@@ -1,3 +1,5 @@
+//여기에서 기본주소checkbox를 클릭하면 수파베이스에 isDefault 값이 true로 변경되어야 하는데 false로 됨
+
 'use client';
 
 import { useState } from 'react';
@@ -29,6 +31,7 @@ const AddressForm = () => {
   const user = useUserState();
   const userId = user?.id;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDefault, setIsDefault] = useState(true);
 
   const { mutate, isPending } = usePostAddressInfo();
 
@@ -76,7 +79,7 @@ const AddressForm = () => {
         postal_code: zonecode,
         road_address: address,
         detail_address: detailAddress,
-        is_default: true, // 첫 주소라 기본주소
+        is_default: isDefault,
         company_image: imageUrl
       },
       {
@@ -164,7 +167,7 @@ const AddressForm = () => {
       </div>
       <div className="mt-8">
         <label className="flex w-full items-start justify-center gap-2">
-          <input type="checkbox" className="accent-(--color-accent) size-4 translate-y-0.5" checked readOnly />
+          <input type="checkbox" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
           <p className="text-sm">
             <span className="mr-1 block md:inline-block">기본 주소로 저장</span>
             <span className="text-(--color-text-base)/70">&#40;첫 주소는 자동으로 기본 주소로 저장됩니다&#41;</span>

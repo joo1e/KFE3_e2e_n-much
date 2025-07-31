@@ -1,3 +1,5 @@
+//여기에서 수파베이스 데이터를 불러와서 반영시켜야 함. 현재 데이터를 수파베이스에 저장하는 것은 됨.
+
 'use client';
 
 import { useGetAddressList } from 'src/entities/addresses/queries/useAddresses'; // 여러개라면
